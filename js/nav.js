@@ -31,6 +31,16 @@ function updateNavOnLogin() {
   console.debug("updateNavOnLogin");
   $(".main-nav-links").show();
   $navLogin.hide();
+  $signupForm.hide();
+  $loginForm.hide();
   $navLogOut.show();
   $navUserProfile.text(`${currentUser.username}`).show();
+  
 }
+
+function navSubmitClick(evt) {
+  $("#submit-story-form").show();
+}
+
+
+$("#nav-submit-story").on("click", navSubmitClick);

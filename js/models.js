@@ -25,7 +25,8 @@ class Story {
 
   getHostName() {
     // UNIMPLEMENTED: complete this function!
-    return "hostname.com";
+    
+    return new URL(this.url).host;
   }
 }
 
@@ -37,6 +38,7 @@ class Story {
 class StoryList {
   constructor(stories) {
     this.stories = stories;
+    this.favorites
   }
 
   /** Generate a new StoryList. It:
@@ -73,7 +75,33 @@ class StoryList {
    * Returns the new Story instance
    */
 
-  async addStory( user, { title, author, url }) {
+//   async addStory( user, { title, author, url }) {
+//     // UNIMPLEMENTED: complete this function!
+//     const token = user.loginToken;
+//     const response = await axios({
+//       method: "POST",
+//       url: "https://hack-or-snooze-v3.herokuapp.com/stories",
+//       data: {
+//         token,
+//         story: {
+          
+//           author: author,
+//           title: title,
+//           url: url
+
+//         }
+//       }
+//     });
+    
+//     let story = new Story(response.data.story);
+//     this.stories.unshift(story);
+//     user.ownStories.unshift(story);
+
+//     return story;
+//   }
+// }
+
+  async addStory( user, newStory ) {
     // UNIMPLEMENTED: complete this function!
     const token = user.loginToken;
     const response = await axios({
@@ -83,35 +111,20 @@ class StoryList {
         token,
         story: {
           
-          author: author,
-          title: title,
-          url: url
+          author: newStory.author,
+          title: newStory.title,
+          url: newStory.url
 
         }
       }
     });
     
-    let story = new Story(response.data.story);
+    let story = response.data.story;
+    
     this.stories.unshift(story);
     user.ownStories.unshift(story);
-    
-    // $(`<li id=${story.storyId}>
-    // ::marker 
-    // <span id="star">
-    //   <i class="far fa-star">
-    //   ::before
-    //   </i>
-    // </span>
-    // <a href="${story.url}" target="a_blank" class="story-link">
-    //   ${story.title}
-    // </a>
-    // <small class="story-hostname">${$hostName}</small>
-    // <small class="story-author:>by ${story.author}</small>
-    // <small class="story-user">posted by ${story.username}</small>
-    // </li>`)
-    // .appendTo($allStoriesList);
 
-    return story;
+    return new Story(story);
   }
 }
 
@@ -188,7 +201,7 @@ class User {
     });
 
     let { user } = response.data;
-
+    // $("span").show();
     return new User(
       {
         username: user.username,
@@ -229,5 +242,36 @@ class User {
       console.error("loginViaStoredCredentials failed", err);
       return null;
     }
+  }
+
+  async addStoryToFavorites(evt) {
+    const token = currentUser.loginToken;
+    const storyId = evt.target.closest("li").id;
+    const username = currentUser.username;
+    console.log(username);
+    const response = await axios.post(`https://hack-or-snooze-v3.herokuapp.com/users/${username}/favorites/${storyId}`, { token: token});
+    // const response = await axios({
+    //   token: currentUser.loginToken, 
+    //   method: "POST",
+    //   url: `https://hack-or-snooze-v3.herokuapp.com/users/${username}/favorites/${storyId}`
+    // });
+    console.log(response);
+    this.favorites.push(response.data);
+  }
+
+  async removeFavoriteStory(evt) {
+    const token = currentUser.loginToken;
+    const storyId = evt.target.closest("li").id;
+    const username = currentUser.username;
+    console.log(username);
+    const response = await axios.delete(`https://hack-or-snooze-v3.herokuapp.com/users/${username}/favorites/${storyId}`, { token: currentUser.loginToken });
+    // const response = await axios({
+    //   url: `https://hack-or-snooze-v3.herokuapp.com/users/${username}/favorites/${storyId}`,
+    //   method: "DELETE",
+    //   token: { token }
+    // });
+    console.log(response);
+    const removedStory = this.favorites.indexOf(response.data);
+    this.favorites.splice(removedStory, 1);
   }
 }

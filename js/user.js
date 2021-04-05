@@ -25,6 +25,7 @@ async function login(evt) {
 
   saveUserCredentialsInLocalStorage();
   updateUIOnUserLogin();
+  getAndShowStoriesOnStart();
 }
 
 $loginForm.on("submit", login);
@@ -60,6 +61,7 @@ function logout(evt) {
   console.debug("logout", evt);
   localStorage.clear();
   location.reload();
+  // $("span").hide();
 }
 
 $navLogOut.on("click", logout);
@@ -114,3 +116,18 @@ function updateUIOnUserLogin() {
 
   updateNavOnLogin();
 }
+
+async function checkFavorite(evt) {
+  const target = evt.target;
+  // console.log(target);
+  if(target.className === "far fa-star"){
+    target.className = "fas fa-star";
+    await currentUser.addStoryToFavorites(evt);
+  } 
+  else if(target.className === "fas fa-star"){
+    target.className = "far fa-star";
+    await currentUser.removeFavoriteStory(evt);
+  }
+}
+
+$("ol").on("click", "i", checkFavorite);
