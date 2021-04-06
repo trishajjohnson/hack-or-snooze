@@ -68,6 +68,25 @@ class StoryList {
     return new StoryList(stories);
   }
 
+  static async getFavorites() {
+    // Note presence of `static` keyword: this indicates that getStories is
+    //  **not** an instance method. Rather, it is a method that is called on the
+    //  class directly. Why doesn't it make sense for getStories to be an
+    //  instance method?
+
+    // query the /stories endpoint (no auth required)
+    const response = await axios({
+      url: `${BASE_URL}/stories`,
+      method: "GET",
+    });
+
+    // turn plain old story objects from API into instances of Story class
+    const stories = response.data.stories.map(story => new Story(story));
+    const favorites = stories.filter(favorite => favorite.classList.contains("favorite"));
+    // build an instance of our own class using the new array of stories
+    return new StoryList(favorites);
+  }
+
   /** Adds story data to API, makes a Story instance, adds it to story list.
    * - user - the current instance of User who will post the story
    * - obj of {title, author, url}
@@ -264,7 +283,7 @@ class User {
     const storyId = evt.target.closest("li").id;
     const username = currentUser.username;
     console.log(username);
-    const response = await axios.delete(`https://hack-or-snooze-v3.herokuapp.com/users/${username}/favorites/${storyId}`, { token: currentUser.loginToken });
+    const response = await axios.delete(`https://hack-or-snooze-v3.herokuapp.com/users/${username}/favorites/${storyId}`, { token });
     // const response = await axios({
     //   url: `https://hack-or-snooze-v3.herokuapp.com/users/${username}/favorites/${storyId}`,
     //   method: "DELETE",

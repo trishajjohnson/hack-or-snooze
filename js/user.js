@@ -121,10 +121,10 @@ async function checkFavorite(evt) {
   const target = evt.target;
   // console.log(target);
   if(target.className === "far fa-star"){
-    target.className = "fas fa-star";
+    target.className = "fas fa-star favorite";
     await currentUser.addStoryToFavorites(evt);
   } 
-  else if(target.className === "fas fa-star"){
+  else if(target.className === "fas fa-star favorite"){
     target.className = "far fa-star";
     await currentUser.removeFavoriteStory(evt);
   }

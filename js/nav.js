@@ -42,5 +42,16 @@ function navSubmitClick(evt) {
   $("#submit-story-form").show();
 }
 
-
 $("#nav-submit-story").on("click", navSubmitClick);
+
+function navFavoritesClick(evt) {
+  hidePageComponents();
+  const favorites = this.favorites;
+
+  for (let fav of storyList.favorites) {
+    const $fav = generateStoryMarkup(fav);
+    $allStoriesList.append($fav);
+  }
+
+  $allStoriesList.show();
+} 
