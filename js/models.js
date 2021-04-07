@@ -268,7 +268,7 @@ class User {
     const storyId = evt.target.closest("li").id;
     const username = currentUser.username;
     console.log(username);
-    const response = await axios.post(`https://hack-or-snooze-v3.herokuapp.com/users/${username}/favorites/${storyId}`, { token: token});
+    const response = await axios.post(`${BASE_URL}/users/${username}/favorites/${storyId}`, { token: token });
     // const response = await axios({
     //   token: currentUser.loginToken, 
     //   method: "POST",
@@ -282,13 +282,13 @@ class User {
     const token = currentUser.loginToken;
     const storyId = evt.target.closest("li").id;
     const username = currentUser.username;
-    console.log(username);
-    const response = await axios.delete(`https://hack-or-snooze-v3.herokuapp.com/users/${username}/favorites/${storyId}`, { token });
-    // const response = await axios({
-    //   url: `https://hack-or-snooze-v3.herokuapp.com/users/${username}/favorites/${storyId}`,
-    //   method: "DELETE",
-    //   token: { token }
-    // });
+    const response = await axios({
+      url: `${BASE_URL}/users/${username}/favorites/${storyId}`,
+      method: "DELETE",
+      data: { 
+        token 
+      }
+    });
     console.log(response);
     const removedStory = this.favorites.indexOf(response.data);
     this.favorites.splice(removedStory, 1);
