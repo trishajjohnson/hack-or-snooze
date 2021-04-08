@@ -17,7 +17,7 @@ $body.on("click", "#nav-all", navAllStories);
 /** Show login/signup on click on "login" */
 
 function navLoginClick(evt) {
-  console.debug("navLoginClick", evt);
+  // console.debug("navLoginClick", evt);
   hidePageComponents();
   $loginForm.show();
   $signupForm.show();
@@ -28,7 +28,7 @@ $navLogin.on("click", navLoginClick);
 /** When a user first logins in, update the navbar to reflect that. */
 
 function updateNavOnLogin() {
-  console.debug("updateNavOnLogin");
+  // console.debug("updateNavOnLogin");
   $(".main-nav-links").show();
   $navLogin.hide();
   $signupForm.hide();
@@ -44,17 +44,18 @@ function navSubmitClick(evt) {
 
 $("#nav-submit-story").on("click", navSubmitClick);
 
-function navFavoritesClick(evt) {
+function navFavoritesClick() {
   hidePageComponents();
-  $allStoriesList.empty();
-  const favorites = currentUser.favorites;
-
-  for (let fav of favorites) {
-    const $fav = generateFavStoryMarkup(fav);
-    $allStoriesList.append($fav);
-  }
-
-  $allStoriesList.show();
+  
+  putFavoritesOnPage();
 } 
 
 $("#nav-favorites").on("click", navFavoritesClick);
+
+function navMyStoriesClick() {
+  hidePageComponents();
+
+  putOwnStoriesOnPage(currentUser.ownStories);
+} 
+
+$("#nav-my-stories").on("click", navMyStoriesClick);

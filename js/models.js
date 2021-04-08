@@ -38,7 +38,6 @@ class Story {
 class StoryList {
   constructor(stories) {
     this.stories = stories;
-    this.favorites
   }
 
   /** Generate a new StoryList. It:
@@ -68,57 +67,12 @@ class StoryList {
     return new StoryList(stories);
   }
 
-  static async getFavorites() {
-    // Note presence of `static` keyword: this indicates that getStories is
-    //  **not** an instance method. Rather, it is a method that is called on the
-    //  class directly. Why doesn't it make sense for getStories to be an
-    //  instance method?
-
-    // query the /stories endpoint (no auth required)
-    const response = await axios({
-      url: `${BASE_URL}/stories`,
-      method: "GET",
-    });
-
-    // turn plain old story objects from API into instances of Story class
-    const stories = response.data.stories.map(story => new Story(story));
-    const favorites = stories.filter(favorite => favorite.classList.contains("favorite"));
-    // build an instance of our own class using the new array of stories
-    return new StoryList(favorites);
-  }
-
   /** Adds story data to API, makes a Story instance, adds it to story list.
    * - user - the current instance of User who will post the story
    * - obj of {title, author, url}
    *
    * Returns the new Story instance
    */
-
-//   async addStory( user, { title, author, url }) {
-//     // UNIMPLEMENTED: complete this function!
-//     const token = user.loginToken;
-//     const response = await axios({
-//       method: "POST",
-//       url: "https://hack-or-snooze-v3.herokuapp.com/stories",
-//       data: {
-//         token,
-//         story: {
-          
-//           author: author,
-//           title: title,
-//           url: url
-
-//         }
-//       }
-//     });
-    
-//     let story = new Story(response.data.story);
-//     this.stories.unshift(story);
-//     user.ownStories.unshift(story);
-
-//     return story;
-//   }
-// }
 
   async addStory( user, newStory ) {
     // UNIMPLEMENTED: complete this function!
@@ -144,6 +98,13 @@ class StoryList {
     user.ownStories.unshift(story);
 
     return new Story(story);
+  }
+
+  async removeStory(story) {
+    
+    const token = currentUser.loginToken;
+    await axios.delete(`${BASE_URL}/stories/${story.storyId}`, {data: { token } });
+    
   }
 }
 
@@ -220,7 +181,7 @@ class User {
     });
 
     let { user } = response.data;
-    // $("span").show();
+
     return new User(
       {
         username: user.username,
@@ -262,35 +223,33 @@ class User {
       return null;
     }
   }
-
-  async addStoryToFavorites(evt) {
+  
+  // Adding/Removing Stories from Favorites 
+  async addFavoriteStory(story) {
     const token = currentUser.loginToken;
-    const storyId = evt.target.closest("li").id;
-    const username = currentUser.username;
-    console.log(username);
-    const response = await axios.post(`${BASE_URL}/users/${username}/favorites/${storyId}`, { token: token });
-    // const response = await axios({
-    //   token: currentUser.loginToken, 
-    //   method: "POST",
-    //   url: `https://hack-or-snooze-v3.herokuapp.com/users/${username}/favorites/${storyId}`
-    // });
-    console.log(response);
-    this.favorites.push(response.data);
+
+    await axios({
+      url: `${BASE_URL}/users/${currentUser.username}/favorites/${story.storyId}`,
+      method: "POST",
+      data: {
+        token 
+      }
+    });
+
+    this.favorites.push(story);
   }
 
-  async removeFavoriteStory(evt) {
+  async removeFavoriteStory(story) {
     const token = currentUser.loginToken;
-    const storyId = evt.target.closest("li").id;
-    const username = currentUser.username;
-    const response = await axios({
-      url: `${BASE_URL}/users/${username}/favorites/${storyId}`,
+
+    await axios({
+      url: `${BASE_URL}/users/${currentUser.username}/favorites/${story.storyId}`,
       method: "DELETE",
       data: { 
         token 
       }
     });
-    console.log(response);
-    const removedStory = this.favorites.indexOf(response.data);
-    this.favorites.splice(removedStory, 1);
+    
+    this.favorites = this.favorites.filter(s => s.storyId !== story.storyId);
   }
 }
